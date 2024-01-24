@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+FRAME_10 = 9
+FRAME_9 = 8
 
 score = ARGV[0]
 scores = score.split(',')
@@ -11,20 +15,42 @@ scores.each do |s|
     shots << s.to_i
   end
 end
+p shots
 
+# フレーム毎の点数に分割
 frames = []
-shots.each_slice(2) do |s|
-  frames << s
-end
-
-point = 0
-frames.each do |frame|
-  if frame[0] == 10 # strike
-    point += 30
-  elsif frame.sum == 10 # spare
-    point += frame[0] + 10
-  else
-    point += frame.sum
+shots.each_slice(2).with_index(0) do |s, i|
+  if i < FRAME_10
+    frames << s
+  elsif i == FRAME_10
+    s -= [0] if s[0] == 10 # 第10フレームはstrikeの0点埋めを削除
+    frames << s
+  elsif i > FRAME_10       # 第10フレームのshot
+    s -= [0] if s[0] == 10 # 第10フレームはstrikeの0点埋めを削除
+    frames.last.push(*s) # 第10フレームのshotを第10フレームに含める
   end
 end
-puts point
+p frames
+
+# 点数計算用の配列作成
+point_frames = []
+frames.each_with_index do |frame, i|
+  puts "第#{i + 1}フレーム: #{frames[i]}"
+  if frame[0] == 10 && i < FRAME_9 # 8投目までのstrike
+    if frames[(i + 1)][0] == 10    # 次もstrikeの場合
+      frame.push(10)               # 1投目の加点
+      frame.push(frames[i + 2][0]) # 2投目の加点
+    else                           # 次がstrike以外の場合
+      frame.push(*frames[i + 1])   # 1,2投目の加点
+    end
+  elsif frame[0] == 10 && i == FRAME_9 # 9投目のstrike
+    frame.push(frames[i + 1][0])       # 1投目の加点
+    frame.push(frames[i + 1][1])       # 2投目の加点
+  elsif frame.sum == 10 && i < FRAME_10 # ９投目までのspare
+    frame.push(frames[(i + 1)][0])      # 1投目の加点
+  end
+  point_frames.push(frame) # 点数計算用の配列に追加
+  puts "合計: #{point_frames.flatten.sum}"
+end
+p point_frames
+p point_frames.flatten.sum # 点数合計の表示
