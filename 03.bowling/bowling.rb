@@ -4,6 +4,7 @@
 FRAME_10 = 9
 FRAME_9 = 8
 
+# 引数の点数を成形
 score = ARGV[0]
 scores = score.split(',')
 shots = []
@@ -52,5 +53,6 @@ frames.each_with_index do |frame, i|
   point_frames.push(frame) # 点数計算用の配列に追加
   puts "合計: #{point_frames.flatten.sum}"
 end
-p point_frames
-p point_frames.flatten.sum # 点数合計の表示
+
+# 点数合計の表示
+puts point_frames.flatten.sum
