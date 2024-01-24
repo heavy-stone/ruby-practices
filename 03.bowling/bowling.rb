@@ -16,7 +16,6 @@ scores.each do |s|
     shots << s.to_i
   end
 end
-p shots
 
 # フレーム毎の点数に分割
 frames = []
@@ -31,12 +30,10 @@ shots.each_slice(2).with_index(0) do |s, i|
     frames.last.push(*s) # 第10フレームのshotを第10フレームに含める
   end
 end
-p frames
 
 # 点数計算用の配列作成
 point_frames = []
 frames.each_with_index do |frame, i|
-  puts "第#{i + 1}フレーム: #{frames[i]}"
   if frame[0] == 10 && i < FRAME_9 # 8投目までのstrike
     if frames[(i + 1)][0] == 10    # 次もstrikeの場合
       frame.push(10)               # 1投目の加点
@@ -51,7 +48,6 @@ frames.each_with_index do |frame, i|
     frame.push(frames[(i + 1)][0])      # 1投目の加点
   end
   point_frames.push(frame) # 点数計算用の配列に追加
-  puts "合計: #{point_frames.flatten.sum}"
 end
 
 # 点数合計の表示
