@@ -1,16 +1,16 @@
 # カレンダーの作成と表示
 module Calender
-  FIRST_DAY = 1       # 月の初日
-  LAST_DAY = -1       # 月の最終日
-  DAY_DIGIT = 2       # 日付の桁数
-  CALENDER_WIDTH = 20 # カレンダーの幅
+  FIRST_DAY_OF_MONTH = 1
+  LAST_DAY_OF_MONTH = -1
+  DAY_DIGIT = 2       # 日付の表示桁数
+  CALENDER_WIDTH = 20 # カレンダーの表示幅
 
   def create
     year = @options['y'].nil? ? Date.today.year : @options['y'].to_i
     month = @options['m'].nil? ? Date.today.month : @options['m'].to_i
 
-    first_date = Date.new(year, month, FIRST_DAY)
-    last_date = Date.new(year, month, LAST_DAY)
+    first_date = Date.new(year, month, FIRST_DAY_OF_MONTH)
+    last_date = Date.new(year, month, LAST_DAY_OF_MONTH)
     month_dates = (first_date..last_date).to_a
     calender_days = month_dates.map do |date|
       day = date.day.to_s
