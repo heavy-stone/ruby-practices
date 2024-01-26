@@ -16,8 +16,8 @@ class Cal
 
   def main
     validate_argv
-    create
-    show
+    calender_string = create
+    show(calender_string)
   end
 end
 

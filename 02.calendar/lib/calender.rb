@@ -23,13 +23,12 @@ module Calender
       formatted_day_string
     end.join
 
-    @calender_title = first_date.strftime('%B %Y').center(CALENDER_WIDTH)
-    @calender_days = '   ' * first_date.wday + calender_days
+    first_date.strftime('%B %Y').center(CALENDER_WIDTH) <<
+      "\nSu Mo Tu We Th Fr Sa\n" <<
+      '   ' * first_date.wday + calender_days
   end
 
-  def show
-    puts @calender_title
-    puts 'Su Mo Tu We Th Fr Sa'
-    puts @calender_days
+  def show(calender_string)
+    puts calender_string
   end
 end
