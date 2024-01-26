@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 # カレンダーの作成と表示
+
 module Calender
   FIRST_DAY_OF_MONTH = 1
   LAST_DAY_OF_MONTH = -1
@@ -20,13 +23,13 @@ module Calender
       formatted_day_string
     end.join
 
-    @calender_title = first_date.strftime("%B %Y").center(CALENDER_WIDTH)
+    @calender_title = first_date.strftime('%B %Y').center(CALENDER_WIDTH)
     @calender_days = '   ' * first_date.wday + calender_days
   end
 
   def show
     puts @calender_title
-    puts "Su Mo Tu We Th Fr Sa"
+    puts 'Su Mo Tu We Th Fr Sa'
     puts @calender_days
   end
 end
