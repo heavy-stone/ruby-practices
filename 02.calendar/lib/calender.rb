@@ -11,7 +11,7 @@ module Calender
 
     first_date = Date.new(year, month, FIRST_DAY_OF_MONTH)
     last_date = Date.new(year, month, LAST_DAY_OF_MONTH)
-    month_dates = (first_date..last_date).to_a
+    month_dates = (first_date..last_date)
     calender_days = month_dates.map do |date|
       day = date.day.to_s
       day = "\e[7m#{day}\e[0m" if date == Date.today # 色反転
