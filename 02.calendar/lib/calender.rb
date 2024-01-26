@@ -13,11 +13,11 @@ module Calender
     last_date = Date.new(year, month, LAST_DAY_OF_MONTH)
     month_dates = (first_date..last_date)
     calender_days = month_dates.map do |date|
-      day = date.day.to_s
-      day = "\e[7m#{day}\e[0m" if date == Date.today # 色反転
-      day = day.rjust(DAY_DIGIT)                     # 日付の桁数を揃える
-      day += date.saturday? ? "\n" : ' '
-      day
+      formatted_day_string = date.day.to_s
+      formatted_day_string = "\e[7m#{formatted_day_string}\e[0m" if date == Date.today # 色反転
+      formatted_day_string = formatted_day_string.rjust(DAY_DIGIT)                     # 日付の桁数を揃える
+      formatted_day_string += date.saturday? ? "\n" : ' '
+      formatted_day_string
     end.join
 
     @calender_title = first_date.strftime("%B %Y").center(CALENDER_WIDTH)
