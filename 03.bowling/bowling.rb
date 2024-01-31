@@ -4,8 +4,8 @@
 FRAME_10 = 9
 FRAME_9 = 8
 
-score = ARGV[0]
-scores = score.split(',')
+score_args = ARGV[0]
+scores = score_args.split(',')
 shots = []
 scores.each do |score|
   if score == 'X'
