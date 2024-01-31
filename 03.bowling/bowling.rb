@@ -23,10 +23,10 @@ shots.each_slice(2).with_index(0) do |shot, i|
   if i < LAST_FRAME
     frames << shot
   elsif i == LAST_FRAME
-    shot -= [0] if shot[0] == STRIKE_SCORE
+    shot -= [ZERO_SCORE] if shot[0] == STRIKE_SCORE
     frames << shot
   elsif i > LAST_FRAME
-    shot -= [0] if shot[0] == STRIKE_SCORE
+    shot -= [ZERO_SCORE] if shot[0] == STRIKE_SCORE
     frames.last.push(*shot)
   end
 end
