@@ -17,15 +17,15 @@ scores.each do |score|
 end
 
 frames = []
-shots.each_slice(2).with_index(0) do |s, i|
+shots.each_slice(2).with_index(0) do |shot, i|
   if i < FRAME_10
-    frames << s
+    frames << shot
   elsif i == FRAME_10
-    s -= [0] if s[0] == 10
-    frames << s
+    shot -= [0] if shot[0] == 10
+    frames << shot
   elsif i > FRAME_10
-    s -= [0] if s[0] == 10
-    frames.last.push(*s)
+    shot -= [0] if shot[0] == 10
+    frames.last.push(*shot)
   end
 end
 
