@@ -31,22 +31,24 @@ shots.each_slice(2).with_index(0) do |shot, i|
   end
 end
 
-point_frames = []
+present_score = 0
+frame_scores = []
 frames.each_with_index do |frame, i|
+  present_score += frame.sum
   if frame[0] == STRIKE_SCORE && i < SECOND_FRAME_FROM_THE_LAST
     if frames[(i + 1)][0] == STRIKE_SCORE
-      frame.push(STRIKE_SCORE)
-      frame.push(frames[i + 2][0])
+      present_score += STRIKE_SCORE
+      present_score += frames[i + 2][0]
     else
-      frame.push(*frames[i + 1])
+      present_score += frames[i + 1].sum
     end
   elsif frame[0] == STRIKE_SCORE && i == SECOND_FRAME_FROM_THE_LAST
-    frame.push(frames[i + 1][0])
-    frame.push(frames[i + 1][1])
+    present_score += frames[i + 1][0]
+    present_score += frames[i + 1][1]
   elsif frame.sum == STRIKE_SCORE && i < LAST_FRAME
-    frame.push(frames[(i + 1)][0])
+    present_score += frames[(i + 1)][0]
   end
-  point_frames.push(frame)
+  frame_scores << present_score
 end
 
-puts point_frames.flatten.sum
+puts frame_scores.last
