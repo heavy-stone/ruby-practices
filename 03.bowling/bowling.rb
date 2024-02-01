@@ -32,7 +32,6 @@ shots.each_slice(2).with_index(0) do |shot, i|
 end
 
 present_score = 0
-frame_scores = []
 frames.each_with_index do |frame, i|
   present_score += frame.sum
   if frame[0] == STRIKE_SCORE && i < SECOND_FRAME_FROM_THE_LAST
@@ -48,7 +47,7 @@ frames.each_with_index do |frame, i|
   elsif frame.sum == STRIKE_SCORE && i < LAST_FRAME
     present_score += frames[(i + 1)][0]
   end
-  frame_scores << present_score
+  present_score
 end
 
-puts frame_scores.last
+puts present_score
