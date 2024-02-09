@@ -10,14 +10,11 @@ end
 
 def ls(input_file_names)
   ljust_width = input_file_names.max_by(&:length).length + WHITESPACE_BETWEEN_FILE_NAMES
-  quotient, remainder = input_file_names.length.divmod(DISPLAYED_COLUMN)
-  column = quotient + (remainder.positive? ? 1 : 0)
+  column = input_file_names.length.ceildiv(DISPLAYED_COLUMN)
   sliced_input_file_names = input_file_names.sort.each_slice(column).to_a
   nil_count_for_transpose = column - sliced_input_file_names[-1].length
-  if remainder.positive?
-    nil_count_for_transpose.times do
-      sliced_input_file_names[-1].push(nil)
-    end
+  nil_count_for_transpose.times do
+    sliced_input_file_names[-1].push(nil)
   end
   sliced_input_file_names.transpose.inject('') do |result, row|
     row.each do |file_name|
