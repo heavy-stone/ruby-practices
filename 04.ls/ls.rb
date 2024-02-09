@@ -16,12 +16,11 @@ def ls(input_file_names)
   nil_count_for_transpose.times do
     sliced_input_file_names[-1].push(nil)
   end
-  sliced_input_file_names.transpose.inject('') do |result, row|
-    row.each do |file_name|
-      result += file_name.to_s.ljust(ljust_width)
-    end
-    result += "\n"
-  end
+  sliced_input_file_names.transpose.map do |row|
+    row.map do |file_name|
+      file_name.to_s.ljust(ljust_width)
+    end.join
+  end.join("\n")
 end
 
 main

@@ -11,7 +11,7 @@ class LsTest < Minitest::Test
       "1   4   8   \n" \
       "10  5   9   \n" \
       "2   6       \n" \
-      "3   7       \n"
+      '3   7       '
     assert_equal expected, ls(input_file_names)
   end
 
@@ -33,7 +33,7 @@ class LsTest < Minitest::Test
       "Gemfile            babel.config.js    log                \n" \
       "Gemfile.lock       bin                package.json       \n" \
       "Procfile           config             postcss.config.js  \n" \
-      "README.md          config.ru                             \n"
+      'README.md          config.ru                             '
     assert_equal expected, ls(input_file_names)
   end
 end
