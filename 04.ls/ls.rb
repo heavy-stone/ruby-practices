@@ -1,14 +1,25 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
+
 WHITESPACE_BETWEEN_FILE_NAMES = 2
 DISPLAYED_COLUMN = 3
 
 def main
-  puts ls(Dir.glob('*'))
+  options = ARGV.getopts('a')
+  puts ls(options)
 end
 
-def ls(input_file_names)
+def ls(options)
+  if options['a']
+    create_output(Dir.entries('.'))
+  else
+    create_output(Dir.glob('*'))
+  end
+end
+
+def create_output(input_file_names)
   ljust_width = input_file_names.max_by(&:length).length + WHITESPACE_BETWEEN_FILE_NAMES
   column = input_file_names.length.ceildiv(DISPLAYED_COLUMN)
   sliced_input_file_names = input_file_names.sort.each_slice(column).to_a
