@@ -23,4 +23,4 @@ def ls(input_file_names)
   end.join("\n")
 end
 
-main
+main if $PROGRAM_NAME == __FILE__
