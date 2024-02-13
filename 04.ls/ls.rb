@@ -39,19 +39,16 @@ end
 def create_output(paths, each_path_filenames)
   if paths.length > 1
     paths.zip(each_path_filenames).map do |path, filenames|
-      next "#{path}:\n" if filenames.empty?
-
       "#{path}:\n#{create_filenames(filenames)}"
     end.join("\n")
   else
-    filenames = each_path_filenames.flatten
-    return '' if filenames.empty?
-
-    create_filenames(filenames)
+    create_filenames(*each_path_filenames)
   end
 end
 
 def create_filenames(filenames)
+  return if filenames.empty?
+
   ljust_width = filenames.max_by(&:length).length + WHITESPACE_BETWEEN_FILE_NAMES
   column = filenames.length.ceildiv(DISPLAYED_COLUMN)
   sliced_filenames = filenames.sort.each_slice(column).to_a
