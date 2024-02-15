@@ -13,7 +13,7 @@ class LsTest < Minitest::Test
       "2   6       \n" \
       "3   7       \n"
     Dir.stub(:glob, filenames) do
-      assert_equal expected, ls({ 'a' => false })
+      assert_equal expected, ls({})
     end
   end
 
@@ -28,7 +28,7 @@ class LsTest < Minitest::Test
       "Procfile           config             postcss.config.js  \n" \
       "README.md          config.ru                             \n"
     Dir.stub(:glob, filenames) do
-      assert_equal expected, ls({ 'a' => false })
+      assert_equal expected, ls({})
     end
   end
 end
