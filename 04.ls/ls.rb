@@ -30,7 +30,7 @@ end
 
 def each_path_filenames(options, paths)
   if options['a']
-    paths.map { |path| Dir.entries(path) }
+    paths.map { |path| Dir.entries(path) } # ..の表示を含めるためentriesを使用
   else
     paths.map { |path| Dir.glob('*', base: path) }
   end
