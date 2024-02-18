@@ -53,23 +53,22 @@ end
 def create_filenames(filenames)
   return if filenames.empty?
 
-  max_length_filename = filenames.max_by do |filename|
-    filename.length + filename.scan(FULL_WIDTH_REGEX).count # 全角文字は2文字としてカウントするため
+  ljust_width = 0
+  each_filename_full_width_counts = filenames.map do |filename|
+    full_width_count = filename.scan(FULL_WIDTH_REGEX).count # 全角文字は2文字としてカウントするため
+    width = filename.length + full_width_count + WHITESPACE_BETWEEN_FILENAMES
+    ljust_width = width if width > ljust_width
+    [filename, full_width_count]
   end
-  ljust_width =
-    max_length_filename.length +
-    max_length_filename.scan(FULL_WIDTH_REGEX).count +
-    WHITESPACE_BETWEEN_FILENAMES
-  column = filenames.length.ceildiv(DISPLAYED_COLUMN)
-  sliced_filenames = filenames.each_slice(column).to_a
-  nil_count_for_transpose = column - sliced_filenames[-1].length
-  nil_count_for_transpose.times do
-    sliced_filenames[-1].push(nil)
+  column = each_filename_full_width_counts.length.ceildiv(DISPLAYED_COLUMN)
+  sliced_each_filename_full_width_counts = each_filename_full_width_counts.each_slice(column).to_a
+  dummy_count_for_transpose = column - sliced_each_filename_full_width_counts[-1].length
+  dummy_count_for_transpose.times do
+    sliced_each_filename_full_width_counts[-1].push(['', 0]) # 末尾の配列の要素数を揃えるためdummyとして['', 0]を追加
   end
-  sliced_filenames.transpose.map do |row|
-    row.map do |filename|
-      filename = filename.to_s if filename.nil?
-      filename.ljust(ljust_width - filename.scan(FULL_WIDTH_REGEX).count)
+  sliced_each_filename_full_width_counts.transpose.map do |row|
+    row.map do |filename, full_width_count|
+      filename.ljust(ljust_width - full_width_count)
     end.join
   end.join("\n").concat("\n")
 end
