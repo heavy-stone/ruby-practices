@@ -57,7 +57,7 @@ def create_filenames(filenames)
   each_filename_full_width_counts = filenames.map do |filename|
     full_width_count = filename.scan(FULL_WIDTH_REGEX).count # 全角文字は2文字としてカウントするため
     width = filename.length + full_width_count + WHITESPACE_BETWEEN_FILENAMES
-    ljust_width = width if width > ljust_width
+    ljust_width = [width, ljust_width].max
     [filename, full_width_count]
   end
   column = each_filename_full_width_counts.length.ceildiv(DISPLAYED_COLUMN)
