@@ -21,14 +21,14 @@ class LsTest < Minitest::Test
   def test_no_option_each_path_filenames_method
     # テスト端末に/etc, /usrが存在することを前提とする
     paths = ['/etc', '/usr']
-    expected = paths.map { |path| Dir.glob('*', base: path) }
+    expected = paths.map { |path| Dir.glob('*', base: path).sort }
     assert_equal expected, each_path_filenames({ 'a' => false }, paths)
   end
 
   def test_a_option_each_path_filenames_method
     # テスト端末に/etc, /usrが存在することを前提とする
     paths = ['/etc', '/usr']
-    expected = paths.map { |path| Dir.entries(path) }
+    expected = paths.map { |path| Dir.entries(path).sort }
     assert_equal expected, each_path_filenames({ 'a' => true }, paths)
   end
 
@@ -48,7 +48,7 @@ class LsTest < Minitest::Test
 
   def test_multi_path_create_output_method
     paths = ['/etc', '/usr']
-    filenames = [[*'1'..'10'], %w[
+    filenames = [[*'1'..'10'].sort, %w[
       Gemfile Gemfile.lock Procfile README.md babel.config.js
       bin config config.ru log package.json postcss.config.js
     ]]

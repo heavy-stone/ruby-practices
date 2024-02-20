@@ -5,7 +5,7 @@ require 'minitest/autorun'
 require_relative '../ls'
 
 class LsTest < Minitest::Test
-  def test_a_option_filenames
+  def test_a_option
     filenames = %w[
       . .. Gemfile Gemfile.lock Procfile README.md babel.config.js
       bin config config.ru log package.json postcss.config.js
