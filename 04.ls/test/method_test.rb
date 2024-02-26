@@ -22,14 +22,14 @@ class LsTest < Minitest::Test
     # テスト端末に/etc, /usrが存在することを前提とする
     paths = ['/etc', '/usr']
     expected = paths.map { |path| Dir.glob('*', base: path).sort }
-    assert_equal expected, each_path_filenames({ 'a' => false }, paths)
+    assert_equal expected, create_each_path_filenames({ 'a' => false }, paths)
   end
 
   def test_a_option_each_path_filenames_method
     # テスト端末に/etc, /usrが存在することを前提とする
     paths = ['/etc', '/usr']
     expected = paths.map { |path| Dir.entries(path).sort }
-    assert_equal expected, each_path_filenames({ 'a' => true }, paths)
+    assert_equal expected, create_each_path_filenames({ 'a' => true }, paths)
   end
 
   def test_no_path_create_output_method
@@ -38,20 +38,22 @@ class LsTest < Minitest::Test
       Gemfile Gemfile.lock Procfile README.md babel.config.js
       bin config config.ru log package.json postcss.config.js
     ]]
+    has_paths = false
     expected =
       "Gemfile            babel.config.js    log                \n" \
       "Gemfile.lock       bin                package.json       \n" \
       "Procfile           config             postcss.config.js  \n" \
       "README.md          config.ru                             \n"
-    assert_equal expected, create_output(paths, filenames)
+    assert_equal expected, create_output({}, paths, filenames, has_paths)
   end
 
-  def test_multi_path_create_output_method
+  def test_multiple_path_create_output_method
     paths = ['/etc', '/usr']
     filenames = [[*'1'..'10'].sort, %w[
       Gemfile Gemfile.lock Procfile README.md babel.config.js
       bin config config.ru log package.json postcss.config.js
     ]]
+    has_paths = true
     expected =
       "/etc:\n" \
       "1   4   8   \n" \
@@ -64,7 +66,7 @@ class LsTest < Minitest::Test
       "Gemfile.lock       bin                package.json       \n" \
       "Procfile           config             postcss.config.js  \n" \
       "README.md          config.ru                             \n"
-    assert_equal expected, create_output(paths, filenames)
+    assert_equal expected, create_output({}, paths, filenames, has_paths)
   end
 
   def test_no_option_create_filenames_method
