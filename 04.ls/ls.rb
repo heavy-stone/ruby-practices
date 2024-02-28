@@ -57,8 +57,8 @@ def filter_l_option_symlink_directory_paths(options, paths, has_paths)
   valid_paths = paths.filter do |path|
     is_symlink_or_not_directory = !File.directory?(path) || File.symlink?(path)
     if is_symlink_or_not_directory
-      _total, rows = create_total_and_rows(path, [], is_symlink_or_not_directory)
-      print rows
+      _total, long_format_table = create_total_and_long_format_table(path, [], is_symlink_or_not_directory)
+      print long_format_table
       next
     end
     path
@@ -92,64 +92,49 @@ def create_long_format_filenames(path, filenames)
   return '' if path.empty?
 
   is_symlink_or_not_directory = !File.directory?(path) || File.symlink?(path)
-  total, long_format_rows = create_total_and_rows(path, filenames, is_symlink_or_not_directory)
+  total, long_format_table = create_total_and_long_format_table(path, filenames, is_symlink_or_not_directory)
   if is_symlink_or_not_directory
-    long_format_rows
+    long_format_table
   elsif filenames.empty?
     total
   else
-    total + long_format_rows
+    total + long_format_table
   end
 end
 
-def create_total_and_rows(path, filenames, is_symlink_or_not_directory)
-  stats = []
-  column_to_fields = { nlinks: [], users: [], groups: [], size_or_rdevs: [] }
-  column_width_to_max_width = { nlink_rjust: 0, user_ljust: 0, group_ljust: 0, size_or_rdev_rjust: 0 }
-  filenames = [path] if is_symlink_or_not_directory
-  link_or_filenames = filenames.map do |filename|
-    filepath = is_symlink_or_not_directory ? filename : "#{path}/#{filename}"
-    stats.push(File.lstat(filepath))
-    push_fields(stats.last, column_to_fields[:nlinks], column_to_fields[:users], column_to_fields[:groups], column_to_fields[:size_or_rdevs])
-    column_width_to_max_width[:nlink_rjust] = [column_width_to_max_width[:nlink_rjust], column_to_fields[:nlinks].last.length].max
-    column_width_to_max_width[:user_ljust] = [column_width_to_max_width[:user_ljust], column_to_fields[:users].last.length].max
-    column_width_to_max_width[:group_ljust] = [column_width_to_max_width[:group_ljust], column_to_fields[:groups].last.length].max
-    column_width_to_max_width[:size_or_rdev_rjust] = [column_width_to_max_width[:size_or_rdev_rjust], column_to_fields[:size_or_rdevs].last.length].max
-    stats.last.ftype == FTYPE_LINK ? "#{filename} -> #{File.readlink(filepath)}" : filename
-  end
-  total = "total #{stats.sum(&:blocks)}\n"
-  long_format_rows = create_long_format_rows(stats, column_to_fields, column_width_to_max_width, link_or_filenames)
-  [total, long_format_rows]
-end
-
-def push_fields(stat, nlinks, users, groups, size_or_rdevs)
-  nlinks.push(stat.nlink.to_s)
-  users.push(Etc.getpwuid(stat.uid).name)
-  groups.push(Etc.getgrgid(stat.gid).name)
-  size_or_rdev =
-    if [FTYPE_BLOCK_SPECIAL, FTYPE_CHARACTER_SPECIAL].include?(stat.ftype)
-      "0x#{stat.rdev.to_s(16)}"
-    else
-      stat.size.to_s
+def create_total_and_long_format_table(path, filenames, is_symlink_or_not_directory)
+  total_block, processing_table = create_processing_table(path, filenames, is_symlink_or_not_directory)
+  column_widths = [0, 0, 0, 0, 0, 0, 0]
+  processing_table.each do |row|
+    row.each_with_index do |field, i|
+      width = field.length
+      column_widths[i] = [column_widths[i], width].max
     end
-  size_or_rdevs.push(size_or_rdev)
+  end
+  total = "total #{total_block}\n"
+  long_format_table = create_long_format_table(processing_table, column_widths)
+  [total, long_format_table]
 end
 
-def create_long_format_rows(stats, column_to_fields, column_width_to_max_width, link_or_filenames)
-  user_and_groups = column_to_fields[:users].zip(column_to_fields[:groups]).map do |user, group| # mapの引数を5つ以上にするとrubocopが警告を出すため先にまとめる
-    "#{user.ljust(column_width_to_max_width[:user_ljust])}  #{group.ljust(column_width_to_max_width[:group_ljust])}"
-  end
-  stats.zip(column_to_fields[:nlinks], user_and_groups, column_to_fields[:size_or_rdevs], link_or_filenames)
-       .map do |stat, nlink, user_and_group, size_or_rdev, link_and_filename|
+def create_processing_table(path, filenames, is_symlink_or_not_directory)
+  total_block = 0
+  filenames = [path] if is_symlink_or_not_directory
+  processing_table = filenames.map do |filename|
+    filepath = is_symlink_or_not_directory ? filename : "#{path}/#{filename}"
+    stat = File.lstat(filepath)
+    total_block += stat.blocks
+    size_or_rdev = [FTYPE_BLOCK_SPECIAL, FTYPE_CHARACTER_SPECIAL].include?(stat.ftype) ? "0x#{stat.rdev.to_s(16)}" : stat.size.to_s
     [
       create_mode(stat.ftype, stat.mode),
-      nlink.rjust(column_width_to_max_width[:nlink_rjust]),
-      user_and_group,
-      size_or_rdev.rjust(column_width_to_max_width[:size_or_rdev_rjust]),
+      stat.nlink.to_s,
+      Etc.getpwuid(stat.uid).name,
+      Etc.getgrgid(stat.gid).name,
+      size_or_rdev,
       stat.mtime.strftime('%b %e %H:%M'),
-      link_and_filename
-    ].join(' ')
-  end.join("\n").concat("\n")
+      stat.ftype == FTYPE_LINK ? "#{filename} -> #{File.readlink(filepath)}" : filename
+    ]
+  end
+  [total_block, processing_table]
 end
 
 def create_mode(ftype, mode)
@@ -170,6 +155,22 @@ def create_rwx_mode(mode)
   rwx_octal_chars.chars.map do |octal_char|
     OCTAL_CHAR_TO_RWX[octal_char]
   end.join
+end
+
+def create_long_format_table(processing_table, column_widths)
+  processing_table.map do |row|
+    row.each_with_index.map do |field, i|
+      if [0, 6].include?(i)
+        field
+      elsif i == 2
+        "#{field.ljust(column_widths[i])} "
+      elsif i == 3
+        field.ljust(column_widths[i])
+      else
+        field.rjust(column_widths[i])
+      end
+    end.join(' ')
+  end.join("\n").concat("\n")
 end
 
 def create_filenames(filenames)

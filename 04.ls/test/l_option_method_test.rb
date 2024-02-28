@@ -33,38 +33,19 @@ class LsTest < Minitest::Test
     assert_equal '-rw-r--r--', create_mode(@etc_passwd_stat.ftype, @etc_passwd_stat.mode)
   end
 
-  def test_create_long_format_rows_method
-    link_or_filenames = Dir.glob('*', base: '/usr')
-    stats = []
-    link_or_filenames = link_or_filenames.map do |filename|
-      filepath = "/usr/#{filename}"
-      stats.push(File.lstat(filepath))
-      stats.last.ftype == FTYPE_LINK ? "#{filename} -> #{File.readlink(filepath)}" : filename
-    end
-    column_to_fields =
-      {
-        nlinks: [],
-        users: [],
-        groups: [],
-        size_or_rdevs: []
-      }
-    column_width_to_max_width =
-      {
-        nlink_rjust: 0,
-        user_ljust: 0,
-        group_ljust: 0,
-        size_or_rdev_rjust: 0
-      }
-    stats.each do |stat|
-      column_to_fields[:nlinks].push(stat.nlink.to_s)
-      column_to_fields[:users].push(Etc.getpwuid(stat.uid).name)
-      column_to_fields[:groups].push(Etc.getgrgid(stat.gid).name)
-      column_to_fields[:size_or_rdevs].push(stat.size.to_s)
-      column_width_to_max_width[:nlink_rjust] = [column_width_to_max_width[:nlink_rjust], column_to_fields[:nlinks].last.length].max
-      column_width_to_max_width[:user_ljust] = [column_width_to_max_width[:user_ljust], column_to_fields[:users].last.length].max
-      column_width_to_max_width[:group_ljust] = [column_width_to_max_width[:group_ljust], column_to_fields[:groups].last.length].max
-      column_width_to_max_width[:size_or_rdev_rjust] = [column_width_to_max_width[:size_or_rdev_rjust], column_to_fields[:size_or_rdevs].last.length].max
-    end
+  def test_create_long_format_table_method
+    processing_table = [
+      ['lrwxr-xr-x', '1', 'root', 'wheel', '25', 'Dec 15 23:43', 'X11 -> ../private/var/select/X11'],
+      ['lrwxr-xr-x', '1', 'root', 'wheel', '25', 'Dec 15 23:43', 'X11R6 -> ../private/var/select/X11'],
+      ['drwxr-xr-x', '982', 'root', 'wheel', '31424', 'Dec 15 23:43', 'bin'],
+      ['drwxr-xr-x', '32', 'root', 'wheel', '1024', 'Dec 15 23:43', 'lib'],
+      ['drwxr-xr-x', '358', 'root', 'wheel', '11456', 'Dec 15 23:43', 'libexec'],
+      ['drwxr-xr-x', '3', 'root', 'wheel', '96', 'Dec 28 18:59', 'local'],
+      ['drwxr-xr-x', '230', 'root', 'wheel', '7360', 'Dec 15 23:43', 'sbin'],
+      ['drwxr-xr-x', '42', 'root', 'wheel', '1344', 'Dec 15 23:43', 'share'],
+      ['drwxr-xr-x', '5', 'root', 'wheel', '160', 'Dec 15 23:43', 'standalone']
+    ]
+    column_widths = [10, 3, 4, 5, 5, 12, 34]
     expected = <<~TEXT
       lrwxr-xr-x   1 root  wheel    25 Dec 15 23:43 X11 -> ../private/var/select/X11
       lrwxr-xr-x   1 root  wheel    25 Dec 15 23:43 X11R6 -> ../private/var/select/X11
@@ -76,7 +57,7 @@ class LsTest < Minitest::Test
       drwxr-xr-x  42 root  wheel  1344 Dec 15 23:43 share
       drwxr-xr-x   5 root  wheel   160 Dec 15 23:43 standalone
     TEXT
-    assert_equal expected, create_long_format_rows(stats, column_to_fields, column_width_to_max_width, link_or_filenames)
+    assert_equal expected, create_long_format_table(processing_table, column_widths)
   end
 
   def test_create_long_format_filenames_method
