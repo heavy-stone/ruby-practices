@@ -142,11 +142,13 @@ def push_fields(stat, nlinks, users, groups, size_or_rdevs)
   nlinks.push(stat.nlink.to_s)
   users.push(Etc.getpwuid(stat.uid).name)
   groups.push(Etc.getgrgid(stat.gid).name)
-  if [FTYPE_BLOCK_SPECIAL, FTYPE_CHARACTER_SPECIAL].include?(stat.ftype)
-    size_or_rdevs.push("0x#{stat.rdev.to_s(16)}")
-  else
-    size_or_rdevs.push(stat.size.to_s)
-  end
+  size_or_rdev =
+    if [FTYPE_BLOCK_SPECIAL, FTYPE_CHARACTER_SPECIAL].include?(stat.ftype)
+      "0x#{stat.rdev.to_s(16)}"
+    else
+      stat.size.to_s
+    end
+  size_or_rdevs.push(size_or_rdev)
 end
 
 def create_long_format_rows(stats, column_to_fields, column_width_to_max_width, link_or_filenames)
