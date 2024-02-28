@@ -104,7 +104,8 @@ end
 
 def create_total_and_rows(path, filenames, is_symlink_or_not_directory)
   stats = []
-  column_to_fields, column_width_to_max_width = create_column_hash
+  column_to_fields = { nlinks: [], users: [], groups: [], size_or_rdevs: [] }
+  column_width_to_max_width = { nlink_rjust: 0, user_ljust: 0, group_ljust: 0, size_or_rdev_rjust: 0 }
   filenames = [path] if is_symlink_or_not_directory
   link_or_filenames = filenames.map do |filename|
     filepath = is_symlink_or_not_directory ? filename : "#{path}/#{filename}"
@@ -119,23 +120,6 @@ def create_total_and_rows(path, filenames, is_symlink_or_not_directory)
   total = "total #{stats.sum(&:blocks)}\n"
   long_format_rows = create_long_format_rows(stats, column_to_fields, column_width_to_max_width, link_or_filenames)
   [total, long_format_rows]
-end
-
-def create_column_hash
-  [
-    {
-      nlinks: [],
-      users: [],
-      groups: [],
-      size_or_rdevs: []
-    },
-    {
-      nlink_rjust: 0,
-      user_ljust: 0,
-      group_ljust: 0,
-      size_or_rdev_rjust: 0
-    }
-  ]
 end
 
 def push_fields(stat, nlinks, users, groups, size_or_rdevs)
