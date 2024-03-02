@@ -20,7 +20,7 @@ class LsTest < Minitest::Test
     end
   end
 
-  def test_r_option_with_multi_paths
+  def test_r_option_with_multiple_paths
     paths = ['/etc', '/usr']
     filenames = [[*'1'..'10'].sort, %w[
       Gemfile Gemfile.lock Procfile README.md babel.config.js
@@ -38,7 +38,7 @@ class LsTest < Minitest::Test
       "package.json       bin                Gemfile.lock       \n" \
       "log                babel.config.js    Gemfile            \n" \
       "config.ru          README.md                             \n"
-    stub(:each_path_filenames, filenames) do
+    stub(:create_each_path_filenames, filenames) do
       assert_equal expected, ls({ 'r' => true }, paths)
     end
   end
