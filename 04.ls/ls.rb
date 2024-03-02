@@ -24,6 +24,10 @@ OCTAL_CHAR_TO_RWX = {
   '6' => 'rw-',
   '7' => 'rwx'
 }.freeze
+MODE_INDEX = 0
+USER_INDEX = 2
+GROUP_INDEX = 3
+FILENAME_INDEX = 6
 
 def main
   options = ARGV.getopts('arl')
@@ -160,11 +164,11 @@ end
 def create_long_format_table(processing_table, column_widths)
   processing_table.map do |row|
     row.each_with_index.map do |field, i|
-      if [0, 6].include?(i)
+      if [MODE_INDEX, FILENAME_INDEX].include?(i)
         field
-      elsif i == 2
+      elsif i == USER_INDEX
         "#{field.ljust(column_widths[i])} "
-      elsif i == 3
+      elsif i == GROUP_INDEX
         field.ljust(column_widths[i])
       else
         field.rjust(column_widths[i])
