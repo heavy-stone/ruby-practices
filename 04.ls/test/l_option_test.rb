@@ -9,8 +9,8 @@ class LsTest < Minitest::Test
   def test_l_option_with_multiple_paths
     paths = ['/usr', '/dev/disk1', '/dev/zero']
     expected_output = <<~TEXT
-      brw-r----- 1 root  operator 0x1000004 Feb 23 21:55 /dev/disk1
-      crw-rw-rw- 1 root  wheel 0x3000003 Feb 23 21:55 /dev/zero
+      brw-r----- 1 root  operator 0x1000004 Mar  4 17:43 /dev/disk1
+      crw-rw-rw- 1 root  wheel 0x3000003 Mar  4 17:43 /dev/zero
 
     TEXT
     expected = <<~TEXT

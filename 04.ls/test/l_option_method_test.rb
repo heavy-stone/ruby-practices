@@ -99,11 +99,16 @@ class LsTest < Minitest::Test
     assert_equal expected, create_output({ 'l' => true }, paths, each_path_filenames, has_paths)
   end
 
-  def test_filter_l_option_symlink_directory_paths_method
-    paths = ['/etc', '/cores', '/usr'] # /etcはシンボリックリンク、/coresは空ディレクトリ、/usrはディレクトリを想定
+  def test_l_option_print_symlink_or_not_directory_method
+    symlink_or_not_directory_paths = ['/etc']
     has_paths = true
-    assert_output("lrwxr-xr-x 1 root  wheel 11 Dec 15 23:43 /etc -> private/etc\n\n", '') do
-      assert_equal ['/cores', '/usr'], filter_l_option_symlink_directory_paths({ 'l' => true }, paths, has_paths)
-    end
+    expected_stdout = "lrwxr-xr-x 1 root  wheel 11 Dec 15 23:43 /etc -> private/etc\n\n"
+    assert_output(expected_stdout, '') { print_symlink_or_not_directory({ 'l' => true }, symlink_or_not_directory_paths, has_paths) }
+  end
+
+  def test_l_option_partition_symlink_or_not_directory_paths_method
+    paths = ['/etc', '/dev/zero', '/usr'] # /etcはシンボリックリンク、/dev/zeroはキャラクタ特殊ファイル、/usrはディレクトリを想定
+    expected = [['/etc', '/dev/zero'], ['/usr']]
+    assert_equal expected, partition_symlink_or_not_directory_paths({ 'l' => true }, paths)
   end
 end
