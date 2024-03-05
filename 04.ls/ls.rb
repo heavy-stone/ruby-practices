@@ -38,7 +38,9 @@ end
 def ls(options, paths = [CURRENT_DIRECTORY])
   has_paths = paths.length > 1
   valid_paths = validate_paths(paths)
-  valid_paths = filter_l_option_symlink_directory_paths(options, valid_paths, has_paths)
+  symlink_or_not_directory_paths, valid_paths = partition_symlink_or_not_directory_paths(options, valid_paths)
+  print_symlink_or_not_directory(options, symlink_or_not_directory_paths, has_paths)
+
   valid_paths = valid_paths.reverse if options['r']
   each_path_filenames = create_each_path_filenames(options, valid_paths)
   each_path_filenames = each_path_filenames.map(&:reverse) if options['r']
@@ -55,20 +57,27 @@ def validate_paths(paths)
   end
 end
 
-def filter_l_option_symlink_directory_paths(options, paths, has_paths)
-  return paths unless options['l']
-
-  valid_paths = paths.filter do |path|
-    is_symlink_or_not_directory = !File.directory?(path) || File.symlink?(path)
-    if is_symlink_or_not_directory
-      _total, long_format_table = create_total_and_long_format_table(path, [], is_symlink_or_not_directory)
-      print long_format_table
-      next
-    end
-    path
+def partition_symlink_or_not_directory_paths(options, paths)
+  if options['l']
+    paths.partition { |path| !File.directory?(path) || File.symlink?(path) }
+  else
+    paths.partition { |path| !File.directory?(path) }
   end
-  print "\n" if has_paths && paths != valid_paths
-  valid_paths
+end
+
+def print_symlink_or_not_directory(options, symlink_or_not_directory_paths, has_paths)
+  return if symlink_or_not_directory_paths.empty?
+
+  symlink_or_not_directory_paths = symlink_or_not_directory_paths.reverse if options['r']
+  if options['l']
+    symlink_or_not_directory_paths.each do |path|
+      _total, long_format_table = create_total_and_long_format_table(path, [], true)
+      print long_format_table
+    end
+  else
+    print symlink_or_not_directory_paths.join(' ').concat("\n")
+  end
+  print "\n" if has_paths
 end
 
 def create_each_path_filenames(options, paths)
