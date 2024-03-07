@@ -47,7 +47,7 @@ class LsTest < Minitest::Test
     assert_equal expected, create_output({}, paths, filenames, has_paths)
   end
 
-  def test_multiple_path_create_output_method
+  def test_multiple_paths_create_output_method
     paths = ['/etc', '/usr']
     filenames = [[*'1'..'10'].sort, %w[
       Gemfile Gemfile.lock Procfile README.md babel.config.js
@@ -94,5 +94,11 @@ class LsTest < Minitest::Test
       "Gemfile.lock       config                                \n" \
       "Procfile           config.ru                             \n"
     assert_equal expected, create_filenames(filenames)
+  end
+
+  def test_no_option_partition_symlink_or_not_directory_paths_method
+    paths = ['/etc', '/dev/zero', '/usr'] # /etcはシンボリックリンク、/dev/zeroはキャラクタ特殊ファイル、/usrはディレクトリを想定
+    expected = [['/dev/zero'], ['/etc', '/usr']]
+    assert_equal expected, partition_symlink_or_not_directory_paths({}, paths)
   end
 end
