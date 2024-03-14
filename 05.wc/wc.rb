@@ -13,12 +13,12 @@ end
 def wc(options, files = [])
   if files.empty?
     lines = $stdin.readlines
-    file_table = [create_file_field_hash_with_lines('', lines)]
+    file_content_counts = [create_file_field_hash_with_lines('', lines)]
   else
-    file_table = files.map { |file| create_file_field_hash(file) }
+    file_content_counts = files.map { |file| create_file_field_hash(file) }
   end
-  total_field_hash = create_total_field_hash(file_table)
-  create_output(file_table, total_field_hash, options)
+  total_field_hash = create_total_field_hash(file_content_counts)
+  create_output(file_content_counts, total_field_hash, options)
 end
 
 def create_file_field_hash(file)
@@ -45,22 +45,22 @@ def create_file_field_hash_with_lines(file, lines, error_message = '')
   { line_length: lines.length, word_length: words.length, bytes:, label: file, error_message: }
 end
 
-def create_total_field_hash(file_table)
-  line_length = file_table.sum { |file| file[:line_length] }
-  word_length = file_table.sum { |file| file[:word_length] }
-  bytes = file_table.sum { |file| file[:bytes] }
+def create_total_field_hash(file_content_counts)
+  line_length = file_content_counts.sum { |file| file[:line_length] }
+  word_length = file_content_counts.sum { |file| file[:word_length] }
+  bytes = file_content_counts.sum { |file| file[:bytes] }
   { line_length:, word_length:, bytes:, label: 'total' }
 end
 
-def create_output(file_table, total_field_hash, options)
-  output = file_table.map do |file_field_hash|
+def create_output(file_content_counts, total_field_hash, options)
+  output = file_content_counts.map do |file_field_hash|
     if file_field_hash[:error_message].empty?
       format_output(file_field_hash, total_field_hash, options)
     else
       file_field_hash[:error_message]
     end
   end.join
-  output += format_output(total_field_hash, total_field_hash, options) if file_table.length > 1
+  output += format_output(total_field_hash, total_field_hash, options) if file_content_counts.length > 1
   output
 end
 
