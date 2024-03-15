@@ -13,12 +13,12 @@ end
 def wc(options, files = [])
   if files.empty?
     lines = $stdin.readlines
-    file_content_counts = [to_file_content_counts('', lines)]
+    file_content_counts_group = [to_file_content_counts('', lines)]
   else
-    file_content_counts = files.map { |file| to_file_content_counts_from_filename(file) }
+    file_content_counts_group = files.map { |file| to_file_content_counts_from_filename(file) }
   end
-  total_file_content_counts = to_total_file_content_counts(file_content_counts)
-  format_counts_group(file_content_counts, total_file_content_counts, options)
+  total_file_content_counts = to_total_file_content_counts(file_content_counts_group)
+  format_file_content_counts_group(file_content_counts_group, total_file_content_counts, options)
 end
 
 def to_file_content_counts_from_filename(file)
@@ -45,33 +45,33 @@ def to_file_content_counts(file, lines, error_message = '')
   { line_length: lines.length, word_length: words.length, bytes:, label: file, error_message: }
 end
 
-def to_total_file_content_counts(file_content_counts)
-  line_length = file_content_counts.sum { |file| file[:line_length] }
-  word_length = file_content_counts.sum { |file| file[:word_length] }
-  bytes = file_content_counts.sum { |file| file[:bytes] }
+def to_total_file_content_counts(file_content_counts_group)
+  line_length = file_content_counts_group.sum { |file| file[:line_length] }
+  word_length = file_content_counts_group.sum { |file| file[:word_length] }
+  bytes = file_content_counts_group.sum { |file| file[:bytes] }
   { line_length:, word_length:, bytes:, label: 'total' }
 end
 
-def format_counts_group(file_content_counts, total_file_content_counts, options)
-  output = file_content_counts.map do |file_content_count|
-    if file_content_count[:error_message].empty?
-      format_counts(file_content_count, total_file_content_counts, options)
+def format_file_content_counts_group(file_content_counts_group, total_file_content_counts, options)
+  output = file_content_counts_group.map do |file_content_counts|
+    if file_content_counts[:error_message].empty?
+      format_file_content_counts(file_content_counts, total_file_content_counts, options)
     else
-      file_content_count[:error_message]
+      file_content_counts[:error_message]
     end
   end.join
-  output += format_counts(total_file_content_counts, total_file_content_counts, options) if file_content_counts.length > 1
+  output += format_file_content_counts(total_file_content_counts, total_file_content_counts, options) if file_content_counts_group.length > 1
   output
 end
 
-def format_counts(file_content_count, total_file_content_counts, options)
+def format_file_content_counts(file_content_counts, total_file_content_counts, options)
   key_to_has_option = { line_length: options['l'], word_length: options['w'], bytes: options['c'] }
   total_file_content_counts.map do |key, value|
     if key == :label
-      " #{file_content_count[:label]}\n"
+      " #{file_content_counts[:label]}\n"
     else
       width = value.to_s.length
-      "\t#{file_content_count[key].to_s.rjust(width)}" if key_to_has_option[key]
+      "\t#{file_content_counts[key].to_s.rjust(width)}" if key_to_has_option[key]
     end
   end.join
 end
