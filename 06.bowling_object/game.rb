@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
 require_relative 'shot'
 require_relative 'frame'
-
-STRIKE_SCORE = 10
-ZERO_SCORE = 0
-LAST_FRAME = 9
-SECOND_FRAME_FROM_THE_LAST = 8
 
 class Game
   def initialize(scores)

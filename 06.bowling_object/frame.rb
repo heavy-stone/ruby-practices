@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 class Frame
   def initialize(first_shot, second_shot, third_shot = nil)
     validate_initialize(first_shot, second_shot, third_shot)
@@ -18,15 +20,15 @@ class Frame
   end
 
   def score
-    first_score + second_score + (@third_shot&.score || 0)
+    first_score + second_score + (@third_shot&.score || ZERO_SCORE)
   end
 
   def strike?
-    first_score == 10
+    first_score == STRIKE_SCORE
   end
 
   def spare?
-    first_score < 10 && score == 10
+    first_score < STRIKE_SCORE && score == STRIKE_SCORE
   end
 
   private
@@ -36,10 +38,10 @@ class Frame
     is_not_last_frame = third_shot.nil?
     valid =
       if is_not_last_frame
-        frame_score <= 10
+        frame_score <= STRIKE_SCORE
       else
         last_frame_score = frame_score + third_shot.score
-        frame_score <= 20 && last_frame_score <= 30
+        frame_score <= MAX_SUM_SCORE_IN_FRAME && last_frame_score <= MAX_SUM_SCORE_IN_LAST_FRAME
       end
     raise ArgumentError, '引数が持つスコア値が適切ではありません' unless valid
   end
