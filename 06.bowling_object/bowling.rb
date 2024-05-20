@@ -5,8 +5,8 @@ require_relative 'game'
 
 class Bowling
   def self.main
-    arg_score = ARGV[0]
-    game = Game.new(arg_score)
+    scores = ARGV[0]
+    game = Game.new(scores)
     puts game.score
   end
 end

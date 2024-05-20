@@ -9,22 +9,26 @@ LAST_FRAME = 9
 SECOND_FRAME_FROM_THE_LAST = 8
 
 class Game
-  def initialize(arg_score)
-    @arg_scores = arg_score.split(',')
+  def initialize(scores)
+    shots = to_shots(scores)
+    frame_shots = to_frame_shots(shots)
+    @frames = frame_shots.map { |frame_shot| Frame.new(*frame_shot) }
   end
 
   def score
-    shots = to_shots
-    frame_shots = to_frame_shots(shots)
-    frames = frame_shots.map { |frame_shot| Frame.new(*frame_shot) }
-    calculate_score(frames)
+    present_score = 0
+    @frames.each_with_index do |frame, index|
+      present_score += frame.score
+      present_score += bonus_score(@frames, frame, index)
+    end
+    present_score
   end
 
   private
 
-  def to_shots
+  def to_shots(scores)
     shots = []
-    @arg_scores.each do |shot|
+    scores.split(',').each do |shot|
       if shot == 'X'
         shots << Shot.new(STRIKE_SCORE)
         shots << Shot.new(ZERO_SCORE)
@@ -49,15 +53,6 @@ class Game
       end
     end
     frame_shots
-  end
-
-  def calculate_score(frames)
-    present_score = 0
-    frames.each_with_index do |frame, index|
-      present_score += frame.score
-      present_score += bonus_score(frames, frame, index)
-    end
-    present_score
   end
 
   def bonus_score(frames, frame, index)
