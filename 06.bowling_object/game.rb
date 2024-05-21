@@ -58,9 +58,9 @@ class Game
     if frame.strike? && index < SECOND_FRAME_FROM_THE_LAST
       strike_bonus_score(frames, index)
     elsif frame.strike? && index == SECOND_FRAME_FROM_THE_LAST
-      frames[index + 1].first_score + frames[index + 1].second_score
+      frames[index + 1].first_shot.score + frames[index + 1].second_shot.score
     elsif frame.spare? && index < LAST_FRAME
-      frames[index + 1].first_score
+      frames[index + 1].first_shot.score
     else
       Shot::ZERO_SCORE
     end
@@ -68,7 +68,7 @@ class Game
 
   def strike_bonus_score(frames, index)
     if frames[index + 1].strike?
-      frames[index + 1].first_score + frames[index + 2].first_score
+      frames[index + 1].first_shot.score + frames[index + 2].first_shot.score
     else
       frames[index + 1].score
     end

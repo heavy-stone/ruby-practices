@@ -5,6 +5,8 @@ class Frame
   MAX_SUM_SCORE_IN_LAST_FRAME = Shot::STRIKE_SCORE * 3
   private_constant :MAX_SUM_SCORE_IN_FRAME, :MAX_SUM_SCORE_IN_LAST_FRAME
 
+  attr_reader :first_shot, :second_shot
+
   def initialize(first_shot, second_shot, third_shot = nil)
     validate_initialize(first_shot, second_shot, third_shot)
 
@@ -13,24 +15,16 @@ class Frame
     @third_shot = third_shot
   end
 
-  def first_score
-    @first_shot.score
-  end
-
-  def second_score
-    @second_shot.score
-  end
-
   def score
-    first_score + second_score + (@third_shot&.score || Shot::ZERO_SCORE)
+    @first_shot.score + @second_shot.score + (@third_shot&.score || Shot::ZERO_SCORE)
   end
 
   def strike?
-    first_score == Shot::STRIKE_SCORE
+    @first_shot.score == Shot::STRIKE_SCORE
   end
 
   def spare?
-    first_score < Shot::STRIKE_SCORE && score == Shot::STRIKE_SCORE
+    @first_shot.score < Shot::STRIKE_SCORE && score == Shot::STRIKE_SCORE
   end
 
   private
