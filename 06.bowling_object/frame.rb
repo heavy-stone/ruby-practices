@@ -8,7 +8,7 @@ class Frame
   attr_reader :first_shot, :second_shot
 
   def initialize(first_shot, second_shot, third_shot = nil)
-    validate_initialize(first_shot, second_shot, third_shot)
+    validate_initial_arguments(first_shot, second_shot, third_shot)
 
     @first_shot = first_shot
     @second_shot = second_shot
@@ -29,7 +29,7 @@ class Frame
 
   private
 
-  def validate_initialize(first_shot, second_shot, third_shot)
+  def validate_initial_arguments(first_shot, second_shot, third_shot)
     frame_score = first_shot.score + second_shot.score
     is_not_last_frame = third_shot.nil?
     valid =
