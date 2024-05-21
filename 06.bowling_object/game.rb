@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'constants'
 require_relative 'shot'
 require_relative 'frame'
 
 class Game
+  LAST_FRAME = 9
+  SECOND_FRAME_FROM_THE_LAST = LAST_FRAME - 1
+  private_constant :LAST_FRAME, :SECOND_FRAME_FROM_THE_LAST
+
   def initialize(scores)
     shots = to_shots(scores)
     frame_shots = to_frame_shots(shots)
@@ -26,8 +29,8 @@ class Game
     shots = []
     scores.split(',').each do |shot|
       if shot == 'X'
-        shots << Shot.new(STRIKE_SCORE)
-        shots << Shot.new(ZERO_SCORE)
+        shots << Shot.new(Shot::STRIKE_SCORE)
+        shots << Shot.new(Shot::ZERO_SCORE)
       else
         shots << Shot.new(shot.to_i)
       end
@@ -41,10 +44,10 @@ class Game
       if index < LAST_FRAME
         frame_shots << sliced_shots
       elsif index == LAST_FRAME
-        sliced_shots.pop if sliced_shots[0].score == STRIKE_SCORE
+        sliced_shots.pop if sliced_shots[0].score == Shot::STRIKE_SCORE
         frame_shots << sliced_shots
       elsif index > LAST_FRAME
-        sliced_shots.pop if sliced_shots[0].score == STRIKE_SCORE
+        sliced_shots.pop if sliced_shots[0].score == Shot::STRIKE_SCORE
         frame_shots.last.push(*sliced_shots)
       end
     end
@@ -59,7 +62,7 @@ class Game
     elsif frame.spare? && index < LAST_FRAME
       frames[index + 1].first_score
     else
-      ZERO_SCORE
+      Shot::ZERO_SCORE
     end
   end
 

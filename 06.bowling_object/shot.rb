@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'constants'
-
 class Shot
+  ZERO_SCORE = 0
+  STRIKE_SCORE = 10
+
   attr_reader :score
 
   def initialize(score)
