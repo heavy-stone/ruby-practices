@@ -15,12 +15,9 @@ class Game
   end
 
   def score
-    present_score = 0
-    @frames.each_with_index do |frame, index|
-      present_score += frame.score
-      present_score += bonus_score(@frames, frame, index)
+    @frames.each_with_index.inject(0) do |total_score, (frame, index)|
+      total_score + frame.score + bonus_score(@frames, frame, index)
     end
-    present_score
   end
 
   private
