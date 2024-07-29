@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'child_entry'
 require_relative 'entry_status'
 require_relative 'common_entry_methods'
 
@@ -7,27 +8,22 @@ class Entry
   include CommonEntryMethods
 
   FULL_WIDTH_REGEX = /[^ -~｡-ﾟ]/
-  DISPLAYED_COLUMN = 3
   MARGIN_BETWEEN_ENTRIES = 2
+  DISPLAYED_COLUMN = 3
+  private_constant :DISPLAYED_COLUMN
 
-  attr_reader :path, :parent_path, :is_parent, :path_full_width_count, :path_width, :not_exist, :status
+  attr_reader :path, :path_full_width_count, :path_width, :not_exist, :status
 
-  def initialize(path, parent_path = nil, is_parent: true)
+  def initialize(path)
     @path = path
-    @parent_path = parent_path
-    @is_parent = is_parent
     @path_full_width_count = @path.scan(FULL_WIDTH_REGEX).count
     @path_width = @path.length + @path_full_width_count
-    @not_exist = !(File.exist?(absolute_path) || File.symlink?(absolute_path))
+    @not_exist = !(File.exist?(@path) || File.symlink?(@path))
     return if @not_exist
 
-    @status = EntryStatus.new(absolute_path)
-    @child_entries = @is_parent ? create_child_entries : []
+    @status = EntryStatus.new(@path)
+    @child_entries = create_child_entries
     @child_entry_max_widths = calc_status_max_widths(@child_entries) if !@child_entries.empty? && LsCommand.option_l?
-  end
-
-  def absolute_path
-    @is_parent ? @path : "#{@parent_path}/#{@path}"
   end
 
   def not_directory?
@@ -38,8 +34,8 @@ class Entry
     "ls: #{@path}: No such file or directory"
   end
 
-  def format_status_with_l_option(entry, max_widths)
-    entry.status.format(entry.path, entry.absolute_path, max_widths)
+  def format_status_with_l_option(max_widths)
+    @status.format(@path, @path, max_widths)
   end
 
   def format_child_entries
@@ -66,7 +62,7 @@ class Entry
         Dir.glob('*', base: @path).sort
       end
     child_entry_paths.reverse! if LsCommand.option_r?
-    child_entry_paths.map { |child_entry_path| Entry.new(child_entry_path, @path, is_parent: false) }
+    child_entry_paths.map { |child_entry_path| ChildEntry.new(child_entry_path, @path) }
   end
 
   def format_without_l_option
@@ -96,7 +92,7 @@ class Entry
         ''
       else
         @child_entries.map do |child_entry|
-          format_status_with_l_option(child_entry, @child_entry_max_widths)
+          child_entry.format_status_with_l_option(@child_entry_max_widths)
         end.join("\n").concat("\n")
       end
     total + formatted_child_entry_statuses

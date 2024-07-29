@@ -45,7 +45,7 @@ class EntryManager
     if LsCommand.option_l?
       not_directory_max_widths = calc_status_max_widths(not_directory_entries)
       not_directory_entries.map do |entry|
-        entry.format_status_with_l_option(entry, not_directory_max_widths)
+        entry.format_status_with_l_option(not_directory_max_widths)
       end.join("\n").concat("\n")
     else
       not_directory_entries.map(&:path).join(' ' * Entry::MARGIN_BETWEEN_ENTRIES).concat("\n")
