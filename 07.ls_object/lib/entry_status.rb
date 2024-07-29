@@ -29,7 +29,6 @@ class EntryStatus
   }.freeze
 
   attr_reader :block, :nlink, :uid, :gid, :size_or_rdev
-  binding.irb
 
   def initialize(path)
     stat = File.lstat(path)
