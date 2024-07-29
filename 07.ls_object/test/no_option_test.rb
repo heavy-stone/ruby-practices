@@ -71,7 +71,7 @@ class NoOptionTest < Minitest::Test
       "ls: /no_exist1: No such file or directory\n" \
       "ls: /no_exist2: No such file or directory\n" \
       "/tmp:\n" \
-      "com.apple.launchd.5GXuNzoPTO   com.brave.Browser.Sparkle.pid  powerlog                       \n" \
+      "com.apple.launchd.5GXuNzoPTO  powerlog                      \n" \
       "\n" \
       "/usr:\n" \
       "X11         lib         sbin        \n" \
