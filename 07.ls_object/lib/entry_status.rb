@@ -40,10 +40,6 @@ class EntryStatus
     @size_or_rdev = [FTYPE_BLOCK_SPECIAL, FTYPE_CHARACTER_SPECIAL].include?(stat.ftype) ? "0x#{stat.rdev.to_s(16)}" : stat.size.to_s
     @mtime = stat.mtime.strftime('%b %e %H:%M')
     @ftype = stat.ftype
-    @max_nlink_width = @nlink.length
-    @max_uid_width = @uid.length
-    @max_gid_width = @gid.length
-    @max_size_or_rdev_width = @size_or_rdev.length
   end
 
   def directory?
