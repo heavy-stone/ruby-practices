@@ -9,6 +9,14 @@ class EntryStatus
   FTYPE_LINK = 'link'
   FTYPE_FIFO = 'fifo'
   FTYPE_SOCKET = 'socket'
+  FTYPES = {
+    FTYPE_BLOCK_SPECIAL => 'b',
+    FTYPE_CHARACTER_SPECIAL => 'c',
+    FTYPE_DIRECTORY => 'd',
+    FTYPE_LINK => 'l',
+    FTYPE_FIFO => 'p',
+    FTYPE_SOCKET => 's'
+  }.freeze
   OCTAL_CHAR_TO_RWX = {
     '0' => '---',
     '1' => '--x',
@@ -21,6 +29,7 @@ class EntryStatus
   }.freeze
 
   attr_reader :block, :nlink, :uid, :gid, :size_or_rdev
+  binding.irb
 
   def initialize(path)
     stat = File.lstat(path)
@@ -62,15 +71,7 @@ class EntryStatus
 
   def format_mode(ftype, mode)
     rwx_mode = format_to_rwx_mode(mode)
-    case ftype
-    when FTYPE_BLOCK_SPECIAL then "b#{rwx_mode}"
-    when FTYPE_CHARACTER_SPECIAL then "c#{rwx_mode}"
-    when FTYPE_DIRECTORY then "d#{rwx_mode}"
-    when FTYPE_LINK then "l#{rwx_mode}"
-    when FTYPE_FIFO then "p#{rwx_mode}"
-    when FTYPE_SOCKET then "s#{rwx_mode}"
-    else "-#{rwx_mode}" # macのls -lでは'whiteout'があるが、ftypeには含まれず、'unknown'などの場合は'file'としておくため
-    end
+    "#{FTYPES[ftype] || '-'}#{rwx_mode}" # macのls -lでは'whiteout'があるが、ftypeには含まれず、'unknown'などの場合は'file'(-)としておく
   end
 
   def format_to_rwx_mode(mode)
