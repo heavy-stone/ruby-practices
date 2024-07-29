@@ -46,23 +46,16 @@ class EntryStatus
     @ftype == FTYPE_LINK
   end
 
-  def format(path, absolute_path)
+  def format(path, absolute_path, max_widths)
     [
       "#{@mode} ",
-      @nlink.rjust(@max_nlink_width),
-      "#{@uid.ljust(@max_uid_width)} ",
-      "#{@gid.ljust(@max_gid_width)} ",
-      @size_or_rdev.rjust(@max_size_or_rdev_width),
+      @nlink.rjust(max_widths[:nlink_width]),
+      "#{@uid.ljust(max_widths[:uid_width])} ",
+      "#{@gid.ljust(max_widths[:gid_width])} ",
+      @size_or_rdev.rjust(max_widths[:size_or_rdev_width]),
       @mtime,
       symlink? ? "#{path} -> #{File.readlink(absolute_path)}" : path
     ].join(' ')
-  end
-
-  def update_max_width(max_nlink_width, max_uid_width, max_gid_width, max_size_or_rdev_width)
-    @max_nlink_width = max_nlink_width
-    @max_uid_width = max_uid_width
-    @max_gid_width = max_gid_width
-    @max_size_or_rdev_width = max_size_or_rdev_width
   end
 
   private

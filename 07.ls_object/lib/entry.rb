@@ -23,26 +23,29 @@ class Entry
 
     @status = EntryStatus.new(absolute_path)
     @child_entries = @is_parent ? create_child_entries : []
+    @child_entry_max_widths = calc_status_max_widths(@child_entries) if !@child_entries.empty? && LsCommand.option_l?
+  end
+
+  def absolute_path
+    @is_parent ? @path : "#{@parent_path}/#{@path}"
   end
 
   def not_directory?
     !directory?
   end
 
-  def format
-    return "ls: #{@path}: No such file or directory" if @not_exist
-
-    if not_directory?
-      LsCommand.option_l? ? format_status_with_l_option : @path
-    else
-      formatted_child_entries = LsCommand.option_l? ? format_with_l_option : format_without_l_option
-      formatted_child_entries = "#{@path}:\n#{formatted_child_entries}" if LsCommand.two_or_more_paths?
-      formatted_child_entries
-    end
+  def format_error
+    "ls: #{@path}: No such file or directory"
   end
 
-  def absolute_path
-    @is_parent ? @path : "#{@parent_path}/#{@path}"
+  def format_status_with_l_option(entry, max_widths)
+    entry.status.format(entry.path, entry.absolute_path, max_widths)
+  end
+
+  def format_child_entries
+    formatted_child_entries = LsCommand.option_l? ? format_with_l_option : format_without_l_option
+    formatted_child_entries = "#{@path}:\n#{formatted_child_entries}" if LsCommand.two_or_more_paths?
+    formatted_child_entries
   end
 
   private
@@ -92,15 +95,10 @@ class Entry
       if @child_entries.empty?
         ''
       else
-        update_max_widths(@child_entries)
         @child_entries.map do |child_entry|
-          format_status_with_l_option(child_entry)
+          format_status_with_l_option(child_entry, @child_entry_max_widths)
         end.join("\n").concat("\n")
       end
     total + formatted_child_entry_statuses
-  end
-
-  def format_status_with_l_option(entry = self)
-    entry.status.format(entry.path, entry.absolute_path)
   end
 end

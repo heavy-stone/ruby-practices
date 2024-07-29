@@ -36,23 +36,25 @@ class EntryManager
   def format_to_error_line(error_entries)
     return '' if error_entries.empty?
 
-    error_entries.map(&:format).join("\n").concat("\n")
+    error_entries.map(&:format_error).join("\n").concat("\n")
   end
 
   def format_to_not_directory_line(not_directory_entries)
     return '' if not_directory_entries.empty?
 
     if LsCommand.option_l?
-      update_max_widths(not_directory_entries)
-      not_directory_entries.map(&:format).join("\n").concat("\n")
+      not_directory_max_widths = calc_status_max_widths(not_directory_entries)
+      not_directory_entries.map do |entry|
+        entry.format_status_with_l_option(entry, not_directory_max_widths)
+      end.join("\n").concat("\n")
     else
-      not_directory_entries.map(&:format).join(' ' * Entry::MARGIN_BETWEEN_ENTRIES).concat("\n")
+      not_directory_entries.map(&:path).join(' ' * Entry::MARGIN_BETWEEN_ENTRIES).concat("\n")
     end
   end
 
   def format_to_directory_line(directory_entries)
     return '' if directory_entries.empty?
 
-    directory_entries.map(&:format).join("\n")
+    directory_entries.map(&:format_child_entries).join("\n")
   end
 end
