@@ -41,11 +41,11 @@ class Entry
     end
   end
 
-  private
-
-  def absolute_path(path = @path, parent_path = @parent_path, is_parent = @is_parent)
-    is_parent ? path : "#{parent_path}/#{path}"
+  def absolute_path
+    @is_parent ? @path : "#{@parent_path}/#{@path}"
   end
+
+  private
 
   def directory?
     if LsCommand.option_l?
@@ -101,7 +101,6 @@ class Entry
   end
 
   def format_status_with_l_option(entry = self)
-    readlink_path = absolute_path(entry.path, entry.parent_path, entry.is_parent)
-    entry.status.format(entry.path, readlink_path)
+    entry.status.format(entry.path, entry.absolute_path)
   end
 end

@@ -46,7 +46,7 @@ class EntryStatus
     @ftype == FTYPE_LINK
   end
 
-  def format(path, readlink_path)
+  def format(path, absolute_path)
     [
       "#{@mode} ",
       @nlink.rjust(@max_nlink_width),
@@ -54,7 +54,7 @@ class EntryStatus
       "#{@gid.ljust(@max_gid_width)} ",
       @size_or_rdev.rjust(@max_size_or_rdev_width),
       @mtime,
-      symlink? ? "#{path} -> #{File.readlink(readlink_path)}" : path
+      symlink? ? "#{path} -> #{File.readlink(absolute_path)}" : path
     ].join(' ')
   end
 
