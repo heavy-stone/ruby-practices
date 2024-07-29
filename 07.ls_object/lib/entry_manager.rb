@@ -19,16 +19,16 @@ class EntryManager
     error_entries, valid_entries = @entries.partition(&:not_exist)
     not_directory_entries, directory_entries = valid_entries.partition(&:not_directory?)
     has_not_directory_and_directory_entries = !not_directory_entries.empty? && !directory_entries.empty?
-    new_line = has_not_directory_and_directory_entries ? "\n" : ''
 
     not_directory_entries.reverse! if LsCommand.option_r?
     directory_entries.reverse! if LsCommand.option_r?
 
-    error_line = format_to_error_line(error_entries)
-    not_directory_entry_line = format_to_not_directory_line(not_directory_entries)
-    directory_entry_line = format_to_directory_line(directory_entries)
-
-    [error_line, not_directory_entry_line, new_line, directory_entry_line].join
+    [
+      format_to_error_line(error_entries),
+      format_to_not_directory_line(not_directory_entries),
+      has_not_directory_and_directory_entries ? "\n" : '',
+      format_to_directory_line(directory_entries)
+    ].join
   end
 
   private
