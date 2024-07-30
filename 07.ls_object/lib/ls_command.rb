@@ -9,8 +9,7 @@ class LsCommand
   def self.exec(options = NO_OPTIONS, paths = [Ls::CURRENT_DIRECTORY])
     @options = options
     @has_two_or_more_path = paths.length >= 2
-    @entry_manager = EntryManager.create_with_data(paths)
-    @entry_manager.output
+    EntryManager.format_entries(paths)
   end
 
   def self.option_a?
