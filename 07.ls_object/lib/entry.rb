@@ -7,17 +7,14 @@ require_relative 'common_entry_methods'
 class Entry
   include CommonEntryMethods
 
-  FULL_WIDTH_REGEX = /[^ -~｡-ﾟ]/
   MARGIN_BETWEEN_ENTRIES = 2
   DISPLAYED_COLUMN = 3
   private_constant :DISPLAYED_COLUMN
 
-  attr_reader :path, :path_full_width_count, :path_width, :not_exist, :status
+  attr_reader :path, :not_exist, :status
 
   def initialize(path)
     @path = path
-    @path_full_width_count = @path.scan(FULL_WIDTH_REGEX).count
-    @path_width = @path.length + @path_full_width_count
     @not_exist = !(File.exist?(@path) || File.symlink?(@path))
     return if @not_exist
 
