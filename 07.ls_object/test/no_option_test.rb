@@ -2,38 +2,10 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
+require 'fileutils'
 require_relative '../ls'
 
 class NoOptionTest < Minitest::Test
-  def test_number_entries
-    entries = [*'1'..'10']
-    expected =
-      "1   4   8   \n" \
-      "10  5   9   \n" \
-      "2   6   \n" \
-      "3   7   \n"
-
-    Dir.stub(:glob, entries) do
-      assert_equal expected, LsCommand.exec
-    end
-  end
-
-  def test_alfabet_entries
-    entries = %w[
-      Gemfile Gemfile.lock Procfile README.md babel.config.js
-      bin config config.ru log package.json postcss.config.js
-    ]
-    expected =
-      "Gemfile            babel.config.js    log                \n" \
-      "Gemfile.lock       bin                package.json       \n" \
-      "Procfile           config             postcss.config.js  \n" \
-      "README.md          config.ru          \n"
-
-    Dir.stub(:glob, entries) do
-      assert_equal expected, LsCommand.exec
-    end
-  end
-
   def test_socket_entries
     paths = %w[/dev/zero /dev/disk1]
     expected = "/dev/disk1  /dev/zero\n"

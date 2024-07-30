@@ -1,54 +1,63 @@
 # frozen_string_literal: true
 
-require_relative 'entry'
-require_relative 'common_entry_methods'
+require_relative 'entry_group'
 
 class EntryManager
-  extend CommonEntryMethods
+  ENTRY_GROUP_TYPE = {
+    error: 'error',
+    not_directory: 'not_directory',
+    directory: 'directory'
+  }.freeze
 
-  def self.format_entries(paths)
+  def self.format_entry_groups(paths)
     sorted_paths = paths.sort
-    entries = sorted_paths.map { |path| Entry.new(path) }
+    valid_paths, error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
+    directory_paths, not_directory_paths = valid_paths.partition { |path| directory?(path) }
 
-    error_entries, valid_entries = entries.partition(&:not_exist)
-    not_directory_entries, directory_entries = valid_entries.partition(&:not_directory?)
-    has_not_directory_and_directory_entries = !not_directory_entries.empty? && !directory_entries.empty?
+    reverse_paths_if_needed!(not_directory_paths, directory_paths)
+    has_not_directory_and_directory = !not_directory_paths.empty? && !directory_paths.empty?
 
-    not_directory_entries.reverse! if LsCommand.option_r?
-    directory_entries.reverse! if LsCommand.option_r?
+    error_entry_group = EntryGroup.new(error_paths, ENTRY_GROUP_TYPE[:error])
+    not_directory_entry_group = EntryGroup.new(not_directory_paths, ENTRY_GROUP_TYPE[:not_directory])
+    directory_entry_groups = create_directory_entry_groups(directory_paths)
 
     [
-      format_to_error_line(error_entries),
-      format_to_not_directory_line(not_directory_entries),
-      has_not_directory_and_directory_entries ? "\n" : '',
-      format_to_directory_line(directory_entries)
+      error_entry_group.format_error_entries,
+      not_directory_entry_group.format_not_directory_entries,
+      has_not_directory_and_directory ? "\n" : '',
+      directory_entry_groups.map(&:format_directory_entries).join("\n")
     ].join
   end
 
-  private
-
-  def self.format_to_error_line(error_entries)
-    return '' if error_entries.empty?
-
-    error_entries.map(&:format_error).join("\n").concat("\n")
-  end
-
-  def self.format_to_not_directory_line(not_directory_entries)
-    return '' if not_directory_entries.empty?
-
+  def self.directory?(path)
     if LsCommand.option_l?
-      not_directory_max_widths = calc_status_max_widths(not_directory_entries)
-      not_directory_entries.map do |entry|
-        entry.format_status_with_l_option(not_directory_max_widths)
-      end.join("\n").concat("\n")
+      File.directory?(path) && !File.symlink?(path)
     else
-      not_directory_entries.map(&:path).join(' ' * Entry::MARGIN_BETWEEN_ENTRIES).concat("\n")
+      File.directory?(path)
     end
   end
 
-  def self.format_to_directory_line(directory_entries)
-    return '' if directory_entries.empty?
+  def self.reverse_paths_if_needed!(not_directory_paths, directory_paths)
+    return if !LsCommand.option_r?
 
-    directory_entries.map(&:format_child_entries).join("\n")
+    not_directory_paths.reverse!
+    directory_paths.reverse!
   end
+
+  def self.create_directory_entry_groups(directory_paths)
+    return [] if directory_paths.empty?
+
+    directory_paths.map do |directory_path|
+      entry_paths =
+        if LsCommand.option_a? && directory?(directory_path)
+          Dir.entries(directory_path).sort # ..の表示を含めるためentriesを使用
+        else
+          Dir.glob('*', base: directory_path).sort
+        end
+      entry_paths.reverse! if LsCommand.option_r?
+      EntryGroup.new(entry_paths, ENTRY_GROUP_TYPE[:directory], directory_path)
+    end
+  end
+
+  private_class_method :directory?, :reverse_paths_if_needed!, :create_directory_entry_groups
 end

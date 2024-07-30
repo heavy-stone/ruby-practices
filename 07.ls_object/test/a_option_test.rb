@@ -6,19 +6,20 @@ require_relative '../ls'
 
 class AOptionTest < Minitest::Test
   def test_a_option
-    entries = %w[
-      . .. Gemfile Gemfile.lock Procfile README.md babel.config.js
-      bin config config.ru log package.json postcss.config.js
-    ]
+    paths = %w[/no_exist1 /no_exist2 /usr /tmp]
     expected =
-      ".                  README.md          log                \n" \
-      "..                 babel.config.js    package.json       \n" \
-      "Gemfile            bin                postcss.config.js  \n" \
-      "Gemfile.lock       config             \n" \
-      "Procfile           config.ru          \n"
+      "ls: /no_exist1: No such file or directory\n" \
+      "ls: /no_exist2: No such file or directory\n" \
+      "/tmp:\n" \
+      ".                             .s.PGSQL.5432                 com.apple.launchd.5GXuNzoPTO  \n" \
+      "..                            .s.PGSQL.5432.lock            powerlog                      \n" \
+      "\n" \
+      "/usr:\n" \
+      ".           bin         sbin        \n" \
+      "..          lib         share       \n" \
+      "X11         libexec     standalone  \n" \
+      "X11R6       local       \n"
 
-    Dir.stub(:entries, entries) do
-      assert_equal expected, LsCommand.exec({ 'a' => true })
-    end
+    assert_equal expected, LsCommand.exec({ 'a' => true }, paths)
   end
 end

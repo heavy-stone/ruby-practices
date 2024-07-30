@@ -42,14 +42,6 @@ class EntryStatus
     @ftype = stat.ftype
   end
 
-  def directory?
-    @ftype == FTYPE_DIRECTORY
-  end
-
-  def symlink?
-    @ftype == FTYPE_LINK
-  end
-
   def format(path, absolute_path, max_widths)
     [
       "#{@mode} ",
@@ -58,7 +50,7 @@ class EntryStatus
       "#{@gid.ljust(max_widths[:gid_width])} ",
       @size_or_rdev.rjust(max_widths[:size_or_rdev_width]),
       @mtime,
-      symlink? ? "#{path} -> #{File.readlink(absolute_path)}" : path
+      @ftype == FTYPE_LINK ? "#{path} -> #{File.readlink(absolute_path)}" : path
     ].join(' ')
   end
 
