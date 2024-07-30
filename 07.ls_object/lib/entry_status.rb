@@ -65,14 +65,11 @@ class EntryStatus
   private
 
   def format_mode(ftype, mode)
-    rwx_mode = format_to_rwx_mode(mode)
-    "#{FTYPES[ftype] || '-'}#{rwx_mode}" # macのls -lでは'whiteout'があるが、ftypeには含まれず、'unknown'などの場合は'file'(-)としておく
-  end
-
-  def format_to_rwx_mode(mode)
     rwx_octal_chars = mode.to_s(8)[-3..]
-    rwx_octal_chars.chars.map do |octal_char|
+    rwx_mode = rwx_octal_chars.chars.map do |octal_char|
       OCTAL_CHAR_TO_RWX[octal_char]
     end.join
+
+    "#{FTYPES[ftype] || '-'}#{rwx_mode}" # macのls -lでは'whiteout'があるが、ftypeには含まれず、'unknown'などの場合は'file'(-)としておく
   end
 end
