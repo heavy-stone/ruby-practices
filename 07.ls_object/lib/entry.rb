@@ -14,16 +14,16 @@ class Entry
     @parent_path = parent_path
     @path_full_width_count = @path.scan(FULL_WIDTH_REGEX).count
     @path_width = @path.length + @path_full_width_count
-    return if @group_type == EntryManager::ENTRY_GROUP_TYPE[:error]
+    return if @group_type == EntryGroup::TYPES[:error]
 
     @status = EntryStatus.new(absolute_path)
   end
 
-  def format_error
+  def format_error_entry
     "ls: #{@path}: No such file or directory"
   end
 
-  def format_status_with_l_option(max_widths)
+  def format_status(max_widths)
     @status.format(@path, absolute_path, max_widths)
   end
 

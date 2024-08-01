@@ -3,12 +3,6 @@
 require_relative 'entry_group'
 
 class EntryManager
-  ENTRY_GROUP_TYPE = {
-    error: 'error',
-    not_directory: 'not_directory',
-    directory: 'directory'
-  }.freeze
-
   def self.format_entry_groups(paths)
     sorted_paths = paths.sort
     valid_paths, error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
@@ -17,15 +11,15 @@ class EntryManager
     reverse_paths_if_needed!(not_directory_paths, directory_paths)
     has_not_directory_and_directory = !not_directory_paths.empty? && !directory_paths.empty?
 
-    error_entry_group = EntryGroup.new(error_paths, ENTRY_GROUP_TYPE[:error])
-    not_directory_entry_group = EntryGroup.new(not_directory_paths, ENTRY_GROUP_TYPE[:not_directory])
+    error_entry_group = EntryGroup.new(error_paths, EntryGroup::TYPES[:error])
+    not_directory_entry_group = EntryGroup.new(not_directory_paths, EntryGroup::TYPES[:not_directory])
     directory_entry_groups = create_directory_entry_groups(directory_paths)
 
     [
-      error_entry_group.format_error_entries,
-      not_directory_entry_group.format_not_directory_entries,
+      error_entry_group.format_entry_group,
+      not_directory_entry_group.format_entry_group,
       has_not_directory_and_directory ? "\n" : '',
-      directory_entry_groups.map(&:format_directory_entries).join("\n")
+      directory_entry_groups.map(&:format_entry_group).join("\n")
     ].join
   end
 
@@ -55,7 +49,7 @@ class EntryManager
           Dir.glob('*', base: directory_path).sort
         end
       entry_paths.reverse! if LsCommand.option_r?
-      EntryGroup.new(entry_paths, ENTRY_GROUP_TYPE[:directory], directory_path)
+      EntryGroup.new(entry_paths, EntryGroup::TYPES[:directory], directory_path)
     end
   end
 
