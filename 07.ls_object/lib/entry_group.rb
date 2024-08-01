@@ -62,6 +62,7 @@ class EntryGroup
     else
       formatted_string += format_paths
     end
+    formatted_string
   end
 
   def format_entry_statuses
