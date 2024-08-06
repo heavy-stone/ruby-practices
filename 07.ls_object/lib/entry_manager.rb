@@ -9,7 +9,6 @@ class EntryManager
     directory_paths, not_directory_paths = valid_paths.partition { |path| directory?(path, option_handler) }
 
     reverse_paths_if_needed!(not_directory_paths, directory_paths, option_handler)
-    has_not_directory_and_directory = !not_directory_paths.empty? && !directory_paths.empty?
 
     error_entry_group = EntryGroup.new(error_paths, EntryGroup::TYPES[:error], option_handler)
     not_directory_entry_group = EntryGroup.new(not_directory_paths, EntryGroup::TYPES[:not_directory], option_handler)
@@ -18,9 +17,8 @@ class EntryManager
     [
       error_entry_group.format_entry_group,
       not_directory_entry_group.format_entry_group,
-      has_not_directory_and_directory ? "\n" : '',
-      directory_entry_groups.map(&:format_entry_group).join("\n")
-    ].join
+      directory_entry_groups&.map(&:format_entry_group)
+    ].compact.join("\n")
   end
 
   def self.directory?(path, option_handler)
@@ -39,7 +37,7 @@ class EntryManager
   end
 
   def self.create_directory_entry_groups(directory_paths, option_handler)
-    return [] if directory_paths.empty?
+    return nil if directory_paths.empty?
 
     directory_paths.map do |directory_path|
       entry_paths =

@@ -31,21 +31,19 @@ class EntryGroup
       format_not_directory_group
     when TYPES[:directory]
       format_directory_group
-    else
-      ''
     end
   end
 
   private
 
   def format_error_group
-    return '' if @entries.empty?
+    return nil if @entries.empty?
 
-    @entries.map(&:format_error_entry).join("\n").concat("\n")
+    @entries.map(&:format_error_entry).join("\n")
   end
 
   def format_not_directory_group
-    return '' if @entries.empty?
+    return nil if @entries.empty?
 
     if @option_handler.option_l?
       format_entry_statuses

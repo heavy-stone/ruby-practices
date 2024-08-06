@@ -32,7 +32,7 @@ class NoOptionTest < Minitest::Test
 
   def test_error_entry
     paths = %w[/no_exist]
-    expected = "ls: /no_exist: No such file or directory\n"
+    expected = 'ls: /no_exist: No such file or directory'
 
     assert_equal expected, LsCommand.exec(LsCommand::NO_OPTIONS, paths)
   end
