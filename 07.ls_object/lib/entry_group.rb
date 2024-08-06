@@ -12,15 +12,15 @@ class EntryGroup
   MARGIN_BETWEEN_ENTRIES = 2
   private_constant :DISPLAYED_COLUMN, :MARGIN_BETWEEN_ENTRIES
 
-  def initialize(paths, group_type, option_handler, parent_path = nil)
+  def initialize(paths, group_type, parent_path = nil, is_status_shown: false)
     @paths = paths
     @group_type = group_type
-    @option_handler = option_handler
     @parent_path = parent_path
+    @is_status_shown = is_status_shown
     @entries = @paths.map { |path| Entry.new(path, @group_type, @parent_path) }
     return if @group_type == TYPES[:error]
 
-    @entry_status_max_widths = calc_entry_status_max_widths if !@entries.empty? && @option_handler.option_l?
+    @entry_status_max_widths = calc_entry_status_max_widths if !@entries.empty? && @is_status_shown
   end
 
   def format_entry_group(is_directory_name_shown: false)
@@ -45,7 +45,7 @@ class EntryGroup
   def format_not_directory_group
     return nil if @entries.empty?
 
-    if @option_handler.option_l?
+    if @is_status_shown
       format_entry_statuses
     else
       @paths.join(' ' * MARGIN_BETWEEN_ENTRIES).concat("\n")
@@ -54,7 +54,7 @@ class EntryGroup
 
   def format_directory_group(is_directory_name_shown)
     formatted_string = is_directory_name_shown ? "#{@parent_path}:\n" : ''
-    if @option_handler.option_l?
+    if @is_status_shown
       total_block = @entries.sum { |entry| entry.status.block }
       formatted_string += "total #{total_block}\n"
       formatted_string += format_entry_statuses

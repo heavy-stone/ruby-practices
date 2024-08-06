@@ -11,8 +11,8 @@ class EntryManager
 
     reverse_paths_if_needed!(not_directory_paths, directory_paths, option_handler)
 
-    error_entry_group = EntryGroup.new(error_paths, EntryGroup::TYPES[:error], option_handler)
-    not_directory_entry_group = EntryGroup.new(not_directory_paths, EntryGroup::TYPES[:not_directory], option_handler)
+    error_entry_group = EntryGroup.new(error_paths, EntryGroup::TYPES[:error])
+    not_directory_entry_group = EntryGroup.new(not_directory_paths, EntryGroup::TYPES[:not_directory], is_status_shown: option_handler.option_l?)
     directory_entry_groups = create_directory_entry_groups(directory_paths, option_handler)
 
     [
@@ -48,7 +48,7 @@ class EntryManager
           Dir.glob('*', base: directory_path).sort
         end
       entry_paths.reverse! if option_handler.option_r?
-      EntryGroup.new(entry_paths, EntryGroup::TYPES[:directory], option_handler, directory_path)
+      EntryGroup.new(entry_paths, EntryGroup::TYPES[:directory], directory_path, is_status_shown: option_handler.option_l?)
     end
   end
 
