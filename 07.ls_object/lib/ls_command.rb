@@ -8,7 +8,7 @@ class LsCommand
   NO_OPTIONS = { a: false, l: false, r: false }.freeze
 
   def self.exec(options = NO_OPTIONS, paths = [Ls::CURRENT_DIRECTORY])
-    option_handler = OptionHandler.new(options, paths)
+    option_handler = OptionHandler.new(options)
     EntryManager.format_entry_groups(paths, option_handler)
   end
 end

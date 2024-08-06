@@ -23,14 +23,14 @@ class EntryGroup
     @entry_status_max_widths = calc_entry_status_max_widths if !@entries.empty? && @option_handler.option_l?
   end
 
-  def format_entry_group
+  def format_entry_group(is_directory_name_shown: false)
     case @group_type
     when TYPES[:error]
       format_error_group
     when TYPES[:not_directory]
       format_not_directory_group
     when TYPES[:directory]
-      format_directory_group
+      format_directory_group(is_directory_name_shown)
     end
   end
 
@@ -52,8 +52,8 @@ class EntryGroup
     end
   end
 
-  def format_directory_group
-    formatted_string = @option_handler.show_directory_name? ? "#{@parent_path}:\n" : ''
+  def format_directory_group(is_directory_name_shown)
+    formatted_string = is_directory_name_shown ? "#{@parent_path}:\n" : ''
     if @option_handler.option_l?
       total_block = @entries.sum { |entry| entry.status.block }
       formatted_string += "total #{total_block}\n"

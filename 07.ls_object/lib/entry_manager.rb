@@ -4,6 +4,7 @@ require_relative 'entry_group'
 
 class EntryManager
   def self.format_entry_groups(paths, option_handler)
+    is_directory_name_shown = paths.length >= 2
     sorted_paths = paths.sort
     valid_paths, error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
     directory_paths, not_directory_paths = valid_paths.partition { |path| directory?(path, option_handler) }
@@ -17,7 +18,7 @@ class EntryManager
     [
       error_entry_group.format_entry_group,
       not_directory_entry_group.format_entry_group,
-      directory_entry_groups&.map(&:format_entry_group)
+      directory_entry_groups&.map { |entry_group| entry_group.format_entry_group(is_directory_name_shown:) }
     ].compact.join("\n")
   end
 

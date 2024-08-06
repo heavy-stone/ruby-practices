@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class OptionHandler
-  def initialize(options, paths)
+  def initialize(options)
     @options = options
-    @paths = paths
   end
 
   def option_a?
@@ -16,9 +15,5 @@ class OptionHandler
 
   def option_r?
     @options['r']
-  end
-
-  def show_directory_name?
-    @paths.length >= 2
   end
 end
