@@ -14,21 +14,20 @@ class LsCommand
     @options = options
     @is_directory_name_shown = paths.length >= 2
     sorted_paths = paths.sort
-    valid_paths, error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
-    directory_paths, not_directory_paths = valid_paths.partition { |path| directory?(path) }
+    valid_paths, @error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
+    @directory_paths, @not_directory_paths = valid_paths.partition { |path| directory?(path) }
 
-    reverse_paths_if_needed!(not_directory_paths, directory_paths)
-
-    @error_entry_group = EntryGroup.new(error_paths, EntryGroup::TYPES[:error])
-    @not_directory_entry_group = EntryGroup.new(not_directory_paths, EntryGroup::TYPES[:not_directory], is_status_shown: option_l?)
-    @directory_entry_groups = create_directory_entry_groups(directory_paths)
+    reverse_paths_if_needed!(@not_directory_paths, @directory_paths)
   end
 
   def format_entry_groups
+    error_entry_group = EntryGroup.new(@error_paths, EntryGroup::TYPES[:error])
+    not_directory_entry_group = EntryGroup.new(@not_directory_paths, EntryGroup::TYPES[:not_directory], is_status_shown: option_l?)
+    directory_entry_groups = create_directory_entry_groups(@directory_paths)
     [
-      @error_entry_group.format_entry_group,
-      @not_directory_entry_group.format_entry_group,
-      @directory_entry_groups&.map { |entry_group| entry_group.format_entry_group(is_directory_name_shown: @is_directory_name_shown) }
+      error_entry_group.format_entry_group,
+      not_directory_entry_group.format_entry_group,
+      directory_entry_groups&.map { |entry_group| entry_group.format_entry_group(is_directory_name_shown: @is_directory_name_shown) }
     ].compact.join("\n")
   end
 
