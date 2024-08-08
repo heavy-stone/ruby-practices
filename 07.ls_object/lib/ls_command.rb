@@ -15,9 +15,8 @@ class LsCommand
     @paths = paths
     sorted_paths = @paths.sort
     valid_paths, @error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
+    valid_paths.reverse! if option_r?
     @directory_paths, @not_directory_paths = valid_paths.partition { |path| directory?(path) }
-
-    reverse_paths_if_needed!(@not_directory_paths, @directory_paths)
   end
 
   def format_entry_groups
@@ -55,13 +54,6 @@ class LsCommand
     else
       File.directory?(path)
     end
-  end
-
-  def reverse_paths_if_needed!(not_directory_paths, directory_paths)
-    return if !option_r?
-
-    not_directory_paths.reverse!
-    directory_paths.reverse!
   end
 
   def create_directory_entry_groups(directory_paths)
