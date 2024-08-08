@@ -12,8 +12,8 @@ class LsCommand
 
   def initialize(options, paths)
     @options = options
-    @is_directory_name_shown = paths.length >= 2
-    sorted_paths = paths.sort
+    @paths = paths
+    sorted_paths = @paths.sort
     valid_paths, @error_paths = sorted_paths.partition { |path| File.exist?(path) || File.symlink?(path) }
     @directory_paths, @not_directory_paths = valid_paths.partition { |path| directory?(path) }
 
@@ -27,11 +27,15 @@ class LsCommand
     [
       error_entry_group.format_entry_group,
       not_directory_entry_group.format_entry_group,
-      directory_entry_groups&.map { |entry_group| entry_group.format_entry_group(is_directory_name_shown: @is_directory_name_shown) }
+      directory_entry_groups&.map { |entry_group| entry_group.format_entry_group(is_directory_name_shown: directory_name_shown?) }
     ].compact.join("\n")
   end
 
   private
+
+  def directory_name_shown?
+    @paths.length >= 2
+  end
 
   def option_a?
     @options[Ls::OPTION_A]
